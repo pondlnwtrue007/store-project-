@@ -12,6 +12,7 @@ function StockContent() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState('');
+    const [filterType, setFilterType] = useState('all'); // 'all' | 'product' | 'spare_part'
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Modal State
@@ -19,7 +20,7 @@ function StockContent() {
     const [currentProduct, setCurrentProduct] = useState(null); // null = create mode
     const [imageMode, setImageMode] = useState('url'); // 'url' | 'upload'
     const [formData, setFormData] = useState({
-        name: '', brand: '', price: '', stock: '', image: ''
+        name: '', brand: '', price: '', stock: '', image: '', type: 'product'
     });
 
     const handleFileChange = (e) => {
@@ -34,10 +35,10 @@ function StockContent() {
     };
 
     // Fetch Products
-    const fetchProducts = async (q = '') => {
+    const fetchProducts = async (q = '', type = 'all') => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/products?q=${q}`);
+            const res = await fetch(`/api/products?q=${q}&type=${type}`);
             const data = await res.json();
             setProducts(data);
         } catch (error) {
@@ -59,8 +60,8 @@ function StockContent() {
     }, [searchParams]);
 
     useEffect(() => {
-        fetchProducts(query);
-    }, [query]);
+        fetchProducts(query, filterType);
+    }, [query, filterType]);
 
     // Handle Modal
     const openModal = (product = null) => {
@@ -71,10 +72,11 @@ function StockContent() {
                 brand: product.brand || '',
                 price: product.price,
                 stock: product.stock,
-                image: product.image || ''
+                image: product.image || '',
+                type: product.type || 'product'
             });
         } else {
-            setFormData({ name: '', brand: '', price: '', stock: '', image: '' });
+            setFormData({ name: '', brand: '', price: '', stock: '', image: '', type: 'product' });
         }
         setIsModalOpen(true);
     };
@@ -100,7 +102,7 @@ function StockContent() {
 
             if (res.ok) {
                 closeModal();
-                fetchProducts(query); // Refresh list
+                fetchProducts(query, filterType); // Refresh list
             } else {
                 alert('Operation failed');
             }
@@ -125,7 +127,7 @@ function StockContent() {
         try {
             const res = await fetch(`/api/products/${deleteId}`, { method: 'DELETE' });
             if (res.ok) {
-                fetchProducts(query);
+                fetchProducts(query, filterType);
                 setDeleteId(null);
             }
         } catch (error) {
@@ -148,6 +150,22 @@ function StockContent() {
                         onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>
+            </div>
+
+            {/* Type Filters */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                {['all', 'product', 'spare_part'].map(type => (
+                    <button
+                        key={type}
+                        onClick={() => setFilterType(type)}
+                        className={`px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filterType === type
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                            : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                            }`}
+                    >
+                        {type === 'all' ? 'ทั้งหมด (All)' : type === 'product' ? 'สินค้าทั่วไป (Product)' : 'อะไหล่ซ่อม (Spare Part)'}
+                    </button>
+                ))}
             </div>
 
             {/* Product List */}
@@ -222,6 +240,18 @@ function StockContent() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-black mb-1">ประเภทสินค้า</label>
+                                <select
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-black"
+                                    value={formData.type}
+                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                >
+                                    <option value="product">สินค้าทั่วไป (Product)</option>
+                                    <option value="spare_part">อะไหล่ซ่อม (Spare Part)</option>
+                                </select>
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-bold text-black mb-1">ชื่อสินค้า</label>
                                 <input

@@ -17,6 +17,11 @@ const ProductSchema = new mongoose.Schema({
         required: [true, 'Please provide stock quantity'],
         default: 0,
     },
+    type: {
+        type: String,
+        enum: ['product', 'spare_part'],
+        default: 'product',
+    },
     image: {
         type: String, // URL or base64
     },

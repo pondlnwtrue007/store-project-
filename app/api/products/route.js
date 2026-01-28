@@ -10,6 +10,7 @@ export async function GET(req) {
         await dbConnect();
         const { searchParams } = new URL(req.url);
         const q = searchParams.get('q');
+        const type = searchParams.get('type');
 
         let query = {};
         if (q) {
@@ -19,6 +20,10 @@ export async function GET(req) {
                     { brand: { $regex: q, $options: 'i' } },
                 ]
             };
+        }
+
+        if (type && type !== 'all') {
+            query.type = type;
         }
 
         const products = await Product.find(query).sort({ createdAt: -1 });
@@ -41,7 +46,7 @@ export async function POST(req) {
         }
 
         const body = await req.json();
-        const { name, brand, price, stock, image } = body;
+        const { name, brand, price, stock, image, type } = body;
 
         if (!name || !price) {
             return NextResponse.json({ error: 'Name and Price are required' }, { status: 400 });
@@ -52,7 +57,8 @@ export async function POST(req) {
             brand,
             price: Number(price),
             stock: Number(stock) || 0,
-            image
+            image,
+            type: type || 'product'
         });
 
         // Log the creation

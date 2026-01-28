@@ -86,9 +86,9 @@ export default function RepairPage() {
     // Add Part Logic
     const searchParts = async (q) => {
         setPartQuery(q);
-        if (q.length < 2) { setPartResults([]); return; }
+        if (q.length < 1) { setPartResults([]); return; }
         try {
-            const res = await fetch(`/api/products?q=${q}`);
+            const res = await fetch(`/api/products?q=${q}&type=spare_part`);
             const data = await res.json();
             setPartResults(data);
         } catch (e) { }
@@ -233,7 +233,7 @@ export default function RepairPage() {
 
                             <div>
                                 <label className="block text-sm font-bold mb-1 text-gray-900">ชื่ออุปกรณ์ / รุ่น</label>
-                                <input className="w-full border p-2 rounded-lg text-black placeholder:text-gray-400" required placeholder="e.g. iPhone 13, Notebook Dell"
+                                <input className="w-full border p-2 rounded-lg text-black placeholder:text-gray-400" required placeholder="e.g. hitachi makita "
                                     value={newRepair.deviceDetails} onChange={e => setNewRepair({ ...newRepair, deviceDetails: e.target.value })} />
                             </div>
 
@@ -372,9 +372,18 @@ export default function RepairPage() {
                                                     <div
                                                         key={p._id}
                                                         onClick={() => addPartToRepair(p)}
-                                                        className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between text-sm"
+                                                        className="p-2 hover:bg-blue-50 cursor-pointer flex items-center justify-between text-sm"
                                                     >
-                                                        <span className="text-black">{p.name}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            {p.image ? (
+                                                                <img src={p.image} alt={p.name} className="w-8 h-8 rounded object-cover border border-gray-200" />
+                                                            ) : (
+                                                                <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                                                                    <Package className="w-4 h-4" />
+                                                                </div>
+                                                            )}
+                                                            <span className="text-black font-medium">{p.name}</span>
+                                                        </div>
                                                         <span className="font-bold text-blue-600">฿{p.price}</span>
                                                     </div>
                                                 ))}
