@@ -51,10 +51,10 @@ const RepairSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-calculate total before saving
-RepairSchema.pre('save', function (next) {
-    const partsTotal = this.parts.reduce((sum, part) => sum + (part.price * part.qty), 0);
-    this.totalCost = partsTotal + this.laborCost;
-    next();
+// Auto-calculate total before saving
+RepairSchema.pre('save', function () {
+    const partsTotal = this.parts?.reduce((sum, part) => sum + (part.price * part.qty), 0) || 0;
+    this.totalCost = partsTotal + (this.laborCost || 0);
 });
 
 export default mongoose.models.Repair || mongoose.model('Repair', RepairSchema);
