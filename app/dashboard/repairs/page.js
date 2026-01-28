@@ -386,6 +386,13 @@ export default function RepairPage() {
 
                             {/* Labor Section */}
                             <div>
+                                <div className="mb-4 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                                    <div className="text-sm text-blue-800 font-bold mb-1">รวมค่าอะไหล่ (Materials Cost)</div>
+                                    <div className="text-xl font-black text-blue-600">
+                                        ฿{(selectedRepair.parts?.reduce((sum, part) => sum + (part.price * (part.qty || 1)), 0) || 0).toLocaleString()}
+                                    </div>
+                                </div>
+
                                 <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
                                     <User className="w-4 h-4" /> ค่าแรง
                                 </h3>
