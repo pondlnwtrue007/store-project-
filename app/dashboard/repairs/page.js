@@ -8,6 +8,7 @@ export default function RepairPage() {
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedRepair, setSelectedRepair] = useState(null); // For detail view
+    const [localLaborCost, setLocalLaborCost] = useState(0); // Optimization
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Create Form State
@@ -155,7 +156,10 @@ export default function RepairPage() {
                         repairs.map(repair => (
                             <div
                                 key={repair._id}
-                                onClick={() => setSelectedRepair(repair)}
+                                onClick={() => {
+                                    setSelectedRepair(repair);
+                                    setLocalLaborCost(repair.laborCost || 0);
+                                }}
                                 className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden flex gap-3"
                             >
                                 <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-xl z-10 ${repair.status === 'Completed' ? 'bg-green-100 text-green-700' :
@@ -389,19 +393,38 @@ export default function RepairPage() {
                                     <input
                                         type="number"
                                         className="border rounded-lg p-2 w-32 font-bold text-black"
-                                        value={selectedRepair.laborCost ?? 0}
-                                        onChange={(e) => updateRepair('updateLabor', { laborCost: Number(e.target.value) })}
+                                        value={localLaborCost}
+                                        onChange={(e) => setLocalLaborCost(Number(e.target.value))}
                                     />
                                     <span className="text-gray-500 text-sm">บาท</span>
+                                    {localLaborCost !== (selectedRepair.laborCost || 0) && (
+                                        <button
+                                            onClick={() => updateRepair('updateLabor', { laborCost: localLaborCost })}
+                                            className="ml-2 bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 shadow-md transition-all flex items-center gap-1 text-xs font-bold"
+                                        >
+                                            <Save className="w-4 h-4" /> บันทึก
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-
                         </div>
 
                         {/* Footer Totals */}
-                        <div className="p-6 border-t bg-gray-50 flex justify-between items-center rounded-b-2xl">
-                            <div className="text-gray-500 font-medium">ยอดรวมทั้งสิ้น</div>
-                            <div className="text-3xl font-black text-blue-600">฿{(selectedRepair.totalCost || 0).toLocaleString()}</div>
+                        <div className="p-6 border-t bg-gray-50 rounded-b-2xl">
+                            <div className="space-y-2 mb-4">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-500">ค่าอะไหล่</span>
+                                    <span className="font-bold text-gray-900">฿{(selectedRepair.parts?.reduce((sum, part) => sum + (part.price * (part.qty || 1)), 0) || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-500">ค่าแรง</span>
+                                    <span className="font-bold text-gray-900">฿{(selectedRepair.laborCost || 0).toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                                <div className="text-gray-500 font-bold">รวมทั้งสิ้น</div>
+                                <div className="text-3xl font-black text-blue-600">฿{(selectedRepair.totalCost || 0).toLocaleString()}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
