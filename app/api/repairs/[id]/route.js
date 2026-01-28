@@ -9,7 +9,8 @@ import { NextResponse } from 'next/server';
 export async function GET(req, { params }) {
     try {
         await dbConnect();
-        const repair = await Repair.findById(params.id);
+        const { id } = await params;
+        const repair = await Repair.findById(id);
         if (!repair) return NextResponse.json({ error: 'Not found' }, { status: 404 });
         return NextResponse.json(repair);
     } catch (error) {
@@ -27,8 +28,9 @@ export async function PUT(req, { params }) {
 
         const body = await req.json();
         const { action, partId, laborCost, status } = body;
+        const { id } = await params;
 
-        const repair = await Repair.findById(params.id);
+        const repair = await Repair.findById(id);
         if (!repair) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
         // Logic for specific actions
@@ -88,8 +90,9 @@ export async function PUT(req, { params }) {
 export async function DELETE(req, { params }) {
     try {
         await dbConnect();
+        const { id } = await params;
         // verify admin? or just allowed
-        await Repair.findByIdAndDelete(params.id);
+        await Repair.findByIdAndDelete(id);
         return NextResponse.json({ message: 'Deleted' });
     } catch (error) {
         return NextResponse.json({ error: 'Failed' }, { status: 500 });

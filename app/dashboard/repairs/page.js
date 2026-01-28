@@ -156,26 +156,45 @@ export default function RepairPage() {
                             <div
                                 key={repair._id}
                                 onClick={() => setSelectedRepair(repair)}
-                                className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden"
+                                className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden flex gap-3"
                             >
-                                <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-xl ${repair.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                                <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-xl z-10 ${repair.status === 'Completed' ? 'bg-green-100 text-green-700' :
                                     repair.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                                     }`}>
                                     {repair.status}
                                 </div>
 
-                                <h3 className="font-bold text-lg text-gray-900 mb-1">{repair.deviceDetails}</h3>
-                                <div className="text-sm text-gray-500 mb-4 flex items-center gap-1">
-                                    <User className="w-3 h-3" /> {repair.customerName}
-                                </div>
-
-                                <div className="flex justify-between items-end border-t border-gray-50 pt-3">
-                                    <div className="text-xs text-gray-400">
-                                        ID: #{repair._id.slice(-6)}
+                                {repair.image ? (
+                                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden mt-6">
+                                        <img src={repair.image} alt="Repair" className="w-full h-full object-cover" />
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-xs text-gray-400">ยอดรวม</div>
-                                        <div className="font-bold text-blue-600">฿{repair.totalCost.toLocaleString()}</div>
+                                ) : (
+                                    <div className="w-20 h-20 bg-gray-50 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-300 mt-6">
+                                        <Wrench className="w-8 h-8" />
+                                    </div>
+                                )}
+
+                                <div className="flex-1 min-w-0 pt-6"> {/* Padding top to avoid overlap with status badge */}
+                                    <h3 className="font-bold text-gray-900 mb-1 truncate text-sm">
+                                        <span className="text-gray-500 font-normal mr-1">อุปกรณ์:</span>
+                                        {repair.deviceDetails}
+                                    </h3>
+                                    <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                                        <span className="font-bold mr-1">อาการ:</span>
+                                        {repair.issueDescription || '-'}
+                                    </p>
+
+                                    <div className="text-xs text-gray-500 mb-2 flex flex-wrap items-center gap-1">
+                                        <User className="w-3 h-3" />
+                                        <span className="font-medium text-gray-700">{repair.customerName}</span>
+                                        <span className="text-gray-400">| {repair.contact}</span>
+                                    </div>
+
+                                    <div className="flex justify-between items-end border-t border-gray-50 pt-2">
+                                        <div className="text-[10px] text-gray-400">
+                                            #{repair._id.slice(-6)}
+                                        </div>
+                                        <div className="font-bold text-blue-600 text-sm">฿{repair.totalCost.toLocaleString()}</div>
                                     </div>
                                 </div>
                             </div>
@@ -209,8 +228,8 @@ export default function RepairPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold mb-1 text-gray-900">อุปกรณ์และปัญหา</label>
-                                <input className="w-full border p-2 rounded-lg text-black placeholder:text-gray-400" required placeholder="e.g. อาการเสีย"
+                                <label className="block text-sm font-bold mb-1 text-gray-900">ชื่ออุปกรณ์ / รุ่น</label>
+                                <input className="w-full border p-2 rounded-lg text-black placeholder:text-gray-400" required placeholder="e.g. iPhone 13, Notebook Dell"
                                     value={newRepair.deviceDetails} onChange={e => setNewRepair({ ...newRepair, deviceDetails: e.target.value })} />
                             </div>
 
@@ -236,8 +255,8 @@ export default function RepairPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold mb-1 text-gray-900">หมายเหตุ</label>
-                                <textarea className="w-full border p-2 rounded-lg h-24 text-black placeholder:text-gray-400"
+                                <label className="block text-sm font-bold mb-1 text-gray-900">อาการเสีย / ปัญหา</label>
+                                <textarea className="w-full border p-2 rounded-lg h-24 text-black placeholder:text-gray-400" placeholder="ระบุอาการเสียอย่างละเอียด..."
                                     value={newRepair.issueDescription} onChange={e => setNewRepair({ ...newRepair, issueDescription: e.target.value })} />
                             </div>
                             <div className="flex gap-2 pt-2">
@@ -296,9 +315,9 @@ export default function RepairPage() {
 
                             {/* Status Control */}
                             <div className="flex items-center gap-2">
-                                <span className="text-sm font-bold text-gray-500">สถานะ:</span>
+                                <span className="text-sm font-bold text-gray-900">สถานะ:</span>
                                 <select
-                                    className="border rounded-lg p-2 font-bold text-gray-700"
+                                    className="border rounded-lg p-2 font-bold text-black"
                                     value={selectedRepair.status || 'Received'}
                                     onChange={(e) => updateRepair('updateStatus', { status: e.target.value })}
                                 >
@@ -321,8 +340,8 @@ export default function RepairPage() {
                                     ) : (
                                         selectedRepair.parts.map((part, idx) => (
                                             <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0 text-sm">
-                                                <span>{part.name}</span>
-                                                <span className="font-bold">฿{(part.price || 0).toLocaleString()}</span>
+                                                <span className="text-black">{part.name}</span>
+                                                <span className="font-bold text-black">฿{(part.price || 0).toLocaleString()}</span>
                                             </div>
                                         ))
                                     )}
@@ -334,7 +353,7 @@ export default function RepairPage() {
                                             <div className="relative flex-1">
                                                 <Search className="absolute left-3 top-2 w-4 h-4 text-gray-400" />
                                                 <input
-                                                    className="w-full border rounded-lg pl-9 pr-2 py-1.5 text-sm"
+                                                    className="w-full border rounded-lg pl-9 pr-2 py-1.5 text-sm text-black"
                                                     placeholder="ค้นหาอะไหล่ (เช่น หน้าจอ)..."
                                                     value={partQuery}
                                                     onChange={(e) => searchParts(e.target.value)}
@@ -351,7 +370,7 @@ export default function RepairPage() {
                                                         onClick={() => addPartToRepair(p)}
                                                         className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between text-sm"
                                                     >
-                                                        <span>{p.name}</span>
+                                                        <span className="text-black">{p.name}</span>
                                                         <span className="font-bold text-blue-600">฿{p.price}</span>
                                                     </div>
                                                 ))}
@@ -369,7 +388,7 @@ export default function RepairPage() {
                                 <div className="flex gap-2 items-center">
                                     <input
                                         type="number"
-                                        className="border rounded-lg p-2 w-32 font-bold"
+                                        className="border rounded-lg p-2 w-32 font-bold text-black"
                                         value={selectedRepair.laborCost ?? 0}
                                         onChange={(e) => updateRepair('updateLabor', { laborCost: Number(e.target.value) })}
                                     />
