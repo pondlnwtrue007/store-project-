@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Plus, Search, Edit2, Trash2, X, Package, Tag, Ban } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-export default function StockPage() {
+// Main Content Component
+function StockContent() {
     const searchParams = useSearchParams();
     const router = useRouter();  // Optional, if we want to clear param
     const [products, setProducts] = useState([]);
@@ -273,7 +274,7 @@ export default function StockPage() {
                                             onClick={() => setImageMode('upload')}
                                             className={`flex-1 py-1 text-xs rounded-md font-medium transition-colors ${imageMode === 'upload' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                                         >
-                                            อัพโหลดไฟล์
+                                            อัปโหลดไฟล์
                                         </button>
                                     </div>
 
@@ -317,5 +318,13 @@ export default function StockPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function StockPage() {
+    return (
+        <Suspense fallback={<div className="text-center py-10 text-gray-500">Loading...</div>}>
+            <StockContent />
+        </Suspense>
     );
 }
