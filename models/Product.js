@@ -22,6 +22,12 @@ const ProductSchema = new mongoose.Schema({
         enum: ['product', 'spare_part'],
         default: 'product',
     },
+    code: {
+        type: String, // Product Code or Spare Part Code
+    },
+    purchaseLink: {
+        type: String,
+    },
     image: {
         type: String, // URL or base64
     },

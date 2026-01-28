@@ -20,7 +20,7 @@ function StockContent() {
     const [currentProduct, setCurrentProduct] = useState(null); // null = create mode
     const [imageMode, setImageMode] = useState('url'); // 'url' | 'upload'
     const [formData, setFormData] = useState({
-        name: '', brand: '', price: '', stock: '', image: '', type: 'product'
+        name: '', brand: '', price: '', stock: '', image: '', type: 'product', code: '', purchaseLink: ''
     });
 
     const handleFileChange = (e) => {
@@ -73,10 +73,12 @@ function StockContent() {
                 price: product.price,
                 stock: product.stock,
                 image: product.image || '',
-                type: product.type || 'product'
+                type: product.type || 'product',
+                code: product.code || '',
+                purchaseLink: product.purchaseLink || ''
             });
         } else {
-            setFormData({ name: '', brand: '', price: '', stock: '', image: '', type: 'product' });
+            setFormData({ name: '', brand: '', price: '', stock: '', image: '', type: 'product', code: '', purchaseLink: '' });
         }
         setIsModalOpen(true);
     };
@@ -189,9 +191,16 @@ function StockContent() {
                                     )}
                                 </div>
                                 <div className="p-4 flex-1 flex flex-col">
-                                    <div className="text-xs text-blue-600 font-semibold mb-1 uppercase tracking-wider">
-                                        <span className="text-gray-500 font-normal normal-case mr-1">ยี่ห้อ:</span>
-                                        {product.brand || 'ไม่ระบุยี่ห้อ'}
+                                    <div className="text-xs text-blue-600 font-semibold mb-1 uppercase tracking-wider flex justify-between">
+                                        <span>
+                                            <span className="text-gray-500 font-normal normal-case mr-1">ยี่ห้อ:</span>
+                                            {product.brand || 'ไม่ระบุยี่ห้อ'}
+                                        </span>
+                                        {product.code && (
+                                            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] border border-gray-200">
+                                                {product.code}
+                                            </span>
+                                        )}
                                     </div>
                                     <h3 className="font-bold text-gray-900 mb-1 truncate" title={product.name}>
                                         <span className="text-sm font-normal text-gray-500 mr-1">ชื่อสินค้า:</span>
@@ -252,13 +261,36 @@ function StockContent() {
                                 </select>
                             </div>
 
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-black mb-1">ชื่อสินค้า</label>
+                                    <input
+                                        type="text" required
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-black"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-black mb-1">
+                                        {formData.type === 'spare_part' ? 'รหัสอะไหล่ (Spare Part Code)' : 'รหัสสินค้า (Product Code)'}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-black"
+                                        value={formData.code}
+                                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
                             <div>
-                                <label className="block text-sm font-bold text-black mb-1">ชื่อสินค้า</label>
+                                <label className="block text-sm font-bold text-black mb-1">ลิงค์สั่งซื้อ (Purchase Link)</label>
                                 <input
-                                    type="text" required
+                                    type="text" placeholder="https://..."
                                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-black"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    value={formData.purchaseLink}
+                                    onChange={(e) => setFormData({ ...formData, purchaseLink: e.target.value })}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">

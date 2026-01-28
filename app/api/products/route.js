@@ -18,6 +18,7 @@ export async function GET(req) {
                 $or: [
                     { name: { $regex: q, $options: 'i' } },
                     { brand: { $regex: q, $options: 'i' } },
+                    { code: { $regex: q, $options: 'i' } },
                 ]
             };
         }
@@ -46,7 +47,7 @@ export async function POST(req) {
         }
 
         const body = await req.json();
-        const { name, brand, price, stock, image, type } = body;
+        const { name, brand, price, stock, image, type, code, purchaseLink } = body;
 
         if (!name || !price) {
             return NextResponse.json({ error: 'Name and Price are required' }, { status: 400 });
@@ -58,7 +59,9 @@ export async function POST(req) {
             price: Number(price),
             stock: Number(stock) || 0,
             image,
-            type: type || 'product'
+            type: type || 'product',
+            code,
+            purchaseLink
         });
 
         // Log the creation

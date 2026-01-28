@@ -382,7 +382,9 @@ export default function RepairPage() {
                                                                     <Package className="w-4 h-4" />
                                                                 </div>
                                                             )}
-                                                            <span className="text-black font-medium">{p.name}</span>
+                                                            <span className="text-black font-medium">
+                                                                {p.name} {p.code && <span className="text-gray-500 text-xs">({p.code})</span>}
+                                                            </span>
                                                         </div>
                                                         <span className="font-bold text-blue-600">฿{p.price}</span>
                                                     </div>

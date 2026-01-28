@@ -18,7 +18,7 @@ export async function PUT(req, { params }) {
         }
 
         const body = await req.json();
-        const { name, brand, price, stock, image } = body;
+        const { name, brand, price, stock, image, type, code, purchaseLink } = body;
 
         const product = await Product.findById(resolvedParams.id);
         if (!product) {
@@ -35,7 +35,11 @@ export async function PUT(req, { params }) {
         product.brand = brand || product.brand;
         product.price = Number(price);
         product.stock = newStock;
+        product.stock = newStock;
         product.image = image || product.image;
+        product.type = type || product.type;
+        product.code = code || product.code;
+        product.purchaseLink = purchaseLink || product.purchaseLink;
 
         await product.save();
 
