@@ -12,6 +12,7 @@ function StockContent() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,6 +87,7 @@ function StockContent() {
     // CRUD Operations
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         const method = currentProduct ? 'PUT' : 'POST';
         const url = currentProduct ? `/api/products/${currentProduct._id}` : '/api/products';
 
@@ -105,6 +107,8 @@ function StockContent() {
         } catch (error) {
             console.error(error);
             alert('Error submitting form');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -314,11 +318,18 @@ function StockContent() {
                             </div>
 
                             <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={closeModal} className="flex-1 px-4 py-2 text-gray-700 font-medium bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                                <button type="button" onClick={closeModal} disabled={isSubmitting} className="flex-1 px-4 py-2 text-gray-700 font-medium bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors disabled:opacity-50">
                                     ยกเลิก
                                 </button>
-                                <button type="submit" className="flex-1 px-4 py-2 text-white font-bold bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-lg shadow-blue-500/20">
-                                    {currentProduct ? 'บันทึกการเปลี่ยนแปลง' : 'เพิ่มสินค้า'}
+                                <button type="submit" disabled={isSubmitting} className="flex-1 px-4 py-2 text-white font-bold bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                    {isSubmitting ? (
+                                        <>
+                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            กำลังบันทึก...
+                                        </>
+                                    ) : (
+                                        currentProduct ? 'บันทึกการเปลี่ยนแปลง' : 'เพิ่มสินค้า'
+                                    )}
                                 </button>
                             </div>
                         </form>

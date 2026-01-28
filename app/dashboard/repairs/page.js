@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, Wrench, User, Phone, Smartphone, CheckCircle, Clock, Save, X, Trash2 } from 'lucide-react';
+import { Package, Plus, Search, Wrench, User, Phone, Smartphone, CheckCircle, Clock, Save, X, Trash2 } from 'lucide-react';
 
 export default function RepairPage() {
     const [repairs, setRepairs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [selectedRepair, setSelectedRepair] = useState(null); // For detail view
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Create Form State
     const [newRepair, setNewRepair] = useState({
@@ -48,6 +49,7 @@ export default function RepairPage() {
     // Create Repair
     const handleCreate = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         try {
             const res = await fetch('/api/repairs', {
                 method: 'POST',
@@ -66,6 +68,7 @@ export default function RepairPage() {
                 alert('Failed to create repair');
             }
         } catch (e) { alert('Failed to create'); }
+        finally { setIsSubmitting(false); }
     };
 
     // ... (rest of searchParts, addPartToRepair, updateRepair - existing code) ...
@@ -238,8 +241,15 @@ export default function RepairPage() {
                                     value={newRepair.issueDescription} onChange={e => setNewRepair({ ...newRepair, issueDescription: e.target.value })} />
                             </div>
                             <div className="flex gap-2 pt-2">
-                                <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-gray-700 hover:bg-gray-200">ยกเลิก</button>
-                                <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Create Job</button>
+                                <button type="button" onClick={() => setShowCreateModal(false)} disabled={isSubmitting} className="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-gray-700 hover:bg-gray-200 disabled:opacity-50">ยกเลิก</button>
+                                <button type="submit" disabled={isSubmitting} className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                    {isSubmitting ? (
+                                        <>
+                                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            กำลังบันทึก...
+                                        </>
+                                    ) : 'Create Job'}
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -289,7 +299,7 @@ export default function RepairPage() {
                                 <span className="text-sm font-bold text-gray-500">สถานะ:</span>
                                 <select
                                     className="border rounded-lg p-2 font-bold text-gray-700"
-                                    value={selectedRepair.status}
+                                    value={selectedRepair.status || 'Received'}
                                     onChange={(e) => updateRepair('updateStatus', { status: e.target.value })}
                                 >
                                     <option value="Received">ได้รับเรื่องแล้ว</option>
@@ -306,13 +316,13 @@ export default function RepairPage() {
                                     <Package className="w-4 h-4" /> อะไหล่ที่ใช้
                                 </h3>
                                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                                    {selectedRepair.parts.length === 0 ? (
+                                    {!selectedRepair.parts || selectedRepair.parts.length === 0 ? (
                                         <div className="text-sm text-gray-400 italic">ยังไม่ได้เพิ่มอะไหล่</div>
                                     ) : (
                                         selectedRepair.parts.map((part, idx) => (
                                             <div key={idx} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0 text-sm">
                                                 <span>{part.name}</span>
-                                                <span className="font-bold">฿{part.price.toLocaleString()}</span>
+                                                <span className="font-bold">฿{(part.price || 0).toLocaleString()}</span>
                                             </div>
                                         ))
                                     )}
@@ -372,7 +382,7 @@ export default function RepairPage() {
                         {/* Footer Totals */}
                         <div className="p-6 border-t bg-gray-50 flex justify-between items-center rounded-b-2xl">
                             <div className="text-gray-500 font-medium">ยอดรวมทั้งสิ้น</div>
-                            <div className="text-3xl font-black text-blue-600">฿{selectedRepair.totalCost.toLocaleString()}</div>
+                            <div className="text-3xl font-black text-blue-600">฿{(selectedRepair.totalCost || 0).toLocaleString()}</div>
                         </div>
                     </div>
                 </div>
