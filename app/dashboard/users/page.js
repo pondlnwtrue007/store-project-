@@ -161,23 +161,23 @@ export default function UsersPage() {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl">
                         <div className="flex items-center justify-between p-6 border-b">
-                            <h2 className="text-xl font-bold">{currentUser ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้ใหม่'}</h2>
+                            <h2 className="text-xl font-bold text-black">{currentUser ? 'แก้ไขผู้ใช้' : 'เพิ่มผู้ใช้ใหม่'}</h2>
                             <button onClick={closeModal} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6" /></button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+                                <label className="block text-sm font-medium text-black mb-1">ชื่อผู้ใช้</label>
                                 <input
                                     type="text" required
                                     disabled={!!currentUser} // Typically prevent changing username
-                                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100 disabled:text-gray-500"
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-100 disabled:text-gray-500 text-black"
                                     value={formData.username}
                                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-black mb-1">
                                     {currentUser ? 'รหัสผ่านใหม่ (ไม่บังคับ)' : 'รหัสผ่าน'}
                                 </label>
                                 <div className="relative">
@@ -186,16 +186,16 @@ export default function UsersPage() {
                                         type="password"
                                         required={!currentUser}
                                         placeholder={currentUser ? "เว้นว่างไว้หากไม่ต้องการเปลี่ยน" : ""}
-                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-black"
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">สิทธิ์การใช้งาน</label>
+                                <label className="block text-sm font-medium text-black mb-1">สิทธิ์การใช้งาน</label>
                                 <select
-                                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                    className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none bg-white text-black"
                                     value={formData.role}
                                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                 >

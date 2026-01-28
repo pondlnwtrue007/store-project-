@@ -108,13 +108,21 @@ function StockContent() {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!confirm('คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?')) return;
+    const [deleteId, setDeleteId] = useState(null);
 
+    // ... (keep existing handleFileChange, fetchProducts, useEffects, openModal, closeModal, handleSubmit)
+
+    const handleDeleteClick = (id) => {
+        setDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
         try {
-            const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/products/${deleteId}`, { method: 'DELETE' });
             if (res.ok) {
                 fetchProducts(query);
+                setDeleteId(null);
             }
         } catch (error) {
             console.error(error);
@@ -182,7 +190,7 @@ function StockContent() {
                                     <button onClick={() => openModal(product)} className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                         <Edit2 className="w-4 h-4" />
                                     </button>
-                                    <button onClick={() => handleDelete(product._id)} className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                    <button onClick={() => handleDeleteClick(product._id)} className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -314,6 +322,35 @@ function StockContent() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+            {/* Delete Confirmation Modal */}
+            {deleteId && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center transform transition-all scale-100">
+                        <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Trash2 className="w-6 h-6 text-red-600" />
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">ยืนยันการลบสินค้า</h3>
+                        <p className="text-gray-500 text-sm mb-6">
+                            คุณแน่ใจหรือไม่ที่จะลบสินค้านี้? <br />
+                            การกระทำนี้ไม่สามารถย้อนกลับได้
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setDeleteId(null)}
+                                className="flex-1 px-4 py-2 text-gray-700 font-medium bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                            >
+                                ยกเลิก
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="flex-1 px-4 py-2 text-white font-bold bg-red-600 hover:bg-red-700 rounded-xl transition-colors shadow-lg shadow-red-500/20"
+                            >
+                                ลบสินค้า
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
