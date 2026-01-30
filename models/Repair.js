@@ -47,6 +47,10 @@ const RepairSchema = new mongoose.Schema({
     },
     technician: {
         type: String, // Username
+    },
+    receivedAt: {
+        type: Date,
+        default: Date.now
     }
 }, { timestamps: true });
 

@@ -27,7 +27,7 @@ export async function PUT(req, { params }) {
         if (!decoded) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const body = await req.json();
-        const { action, partId, laborCost, status } = body;
+        const { action, partId, laborCost, status, receivedAt } = body;
         const { id } = await params;
 
         const repair = await Repair.findById(id);
@@ -73,7 +73,8 @@ export async function PUT(req, { params }) {
             }
             await repair.save();
         } else {
-            // Generic update (e.g. details)
+            // Generic update (e.g. details, receivedAt)
+            if (receivedAt) repair.receivedAt = receivedAt;
             Object.assign(repair, body);
             await repair.save();
         }

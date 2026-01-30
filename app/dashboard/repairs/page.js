@@ -14,7 +14,7 @@ export default function RepairPage() {
     // Create Form State
     const [newRepair, setNewRepair] = useState({
         customerName: '', contact: '', deviceDetails: '', issueDescription: '',
-        image: '', estimatedCost: '', partsSummary: ''
+        image: '', estimatedCost: '', partsSummary: '', receivedAt: new Date().toISOString().slice(0, 16)
     });
     const [imageMode, setImageMode] = useState('url'); // 'url' | 'upload'
 
@@ -61,7 +61,7 @@ export default function RepairPage() {
                 setShowCreateModal(false);
                 setNewRepair({
                     customerName: '', contact: '', deviceDetails: '', issueDescription: '',
-                    image: '', estimatedCost: '', partsSummary: ''
+                    image: '', estimatedCost: '', partsSummary: '', receivedAt: new Date().toISOString().slice(0, 16)
                 });
                 setImageMode('url');
                 fetchRepairs();
@@ -214,7 +214,7 @@ export default function RepairPage() {
 
                                     <div className="flex items-center text-xs text-gray-500 mb-2">
                                         <Clock className="w-3 h-3 mr-1" />
-                                        {new Date(repair.createdAt).toLocaleString('th-TH', {
+                                        {new Date(repair.receivedAt || repair.createdAt).toLocaleString('th-TH', {
                                             day: '2-digit', month: '2-digit', year: 'numeric',
                                             hour: '2-digit', minute: '2-digit'
                                         })}
@@ -243,6 +243,16 @@ export default function RepairPage() {
                                 <label className="block text-sm font-bold mb-1 text-gray-900">ชื่อลูกค้า</label>
                                 <input className="w-full border p-2 rounded-lg text-black placeholder:text-gray-400" required
                                     value={newRepair.customerName} onChange={e => setNewRepair({ ...newRepair, customerName: e.target.value })} />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold mb-1 text-gray-900">วันที่รับสินค้า (Received Date)</label>
+                                <input
+                                    type="datetime-local"
+                                    className="w-full border p-2 rounded-lg text-black bg-gray-50"
+                                    value={newRepair.receivedAt}
+                                    onChange={e => setNewRepair({ ...newRepair, receivedAt: e.target.value })}
+                                />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -314,6 +324,15 @@ export default function RepairPage() {
                                 <div className="text-sm text-gray-400 mb-1">ใบแจ้งซ่อม #{selectedRepair._id.slice(-6)}</div>
                                 <h2 className="text-2xl font-bold text-gray-900">{selectedRepair.deviceDetails}</h2>
                                 <p className="text-gray-500 text-sm mt-1">{selectedRepair.customerName} • {selectedRepair.contact}</p>
+                                <div className="mt-2 text-xs flex items-center gap-2">
+                                    <span className="font-bold text-gray-500">วันที่รับ:</span>
+                                    <input
+                                        type="datetime-local"
+                                        className="border rounded px-2 py-0.5 text-gray-700 bg-gray-50 text-xs"
+                                        value={selectedRepair.receivedAt ? new Date(selectedRepair.receivedAt).toISOString().slice(0, 16) : ''}
+                                        onChange={(e) => updateRepair('updateDetails', { receivedAt: e.target.value })}
+                                    />
+                                </div>
                             </div>
                             <div className="flex gap-2">
                                 <button onClick={handleDelete} className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded-lg transition-colors" title="Delete Repair">
