@@ -114,7 +114,6 @@ export default function RepairPage() {
         } catch (e) { alert('Error adding part'); }
     };
 
-    // Update Status / Labor
     const updateRepair = async (action, payload) => {
         try {
             const res = await fetch(`/api/repairs/${selectedRepair._id}`, {
@@ -128,6 +127,25 @@ export default function RepairPage() {
                 fetchRepairs();
             }
         } catch (e) { console.error(e); }
+    };
+
+    // Delete Repair
+    const handleDelete = async () => {
+        if (!confirm('Are you sure you want to delete this repair job? This cannot be undone.')) return;
+        try {
+            const res = await fetch(`/api/repairs/${selectedRepair._id}`, {
+                method: 'DELETE',
+            });
+            if (res.ok) {
+                setSelectedRepair(null);
+                fetchRepairs();
+            } else {
+                alert('Failed to delete');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Error deleting');
+        }
     };
 
     return (
@@ -192,6 +210,14 @@ export default function RepairPage() {
                                         <User className="w-3 h-3" />
                                         <span className="font-medium text-gray-700">{repair.customerName}</span>
                                         <span className="text-gray-400">| {repair.contact}</span>
+                                    </div>
+
+                                    <div className="flex items-center text-xs text-gray-500 mb-2">
+                                        <Clock className="w-3 h-3 mr-1" />
+                                        {new Date(repair.createdAt).toLocaleString('th-TH', {
+                                            day: '2-digit', month: '2-digit', year: 'numeric',
+                                            hour: '2-digit', minute: '2-digit'
+                                        })}
                                     </div>
 
                                     <div className="flex justify-between items-end border-t border-gray-50 pt-2">
@@ -289,7 +315,12 @@ export default function RepairPage() {
                                 <h2 className="text-2xl font-bold text-gray-900">{selectedRepair.deviceDetails}</h2>
                                 <p className="text-gray-500 text-sm mt-1">{selectedRepair.customerName} • {selectedRepair.contact}</p>
                             </div>
-                            <button onClick={() => setSelectedRepair(null)}><X className="w-6 h-6 text-gray-400" /></button>
+                            <div className="flex gap-2">
+                                <button onClick={handleDelete} className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded-lg transition-colors" title="Delete Repair">
+                                    <Trash2 className="w-6 h-6" />
+                                </button>
+                                <button onClick={() => setSelectedRepair(null)}><X className="w-6 h-6 text-gray-400 hover:text-gray-600" /></button>
+                            </div>
                         </div>
 
                         <div className="p-6 space-y-8 flex-1 overflow-y-auto">
